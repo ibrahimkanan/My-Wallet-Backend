@@ -1,6 +1,8 @@
-import { Pool } from "pg";
+import pg from "pg";
 import dotenv from "dotenv";
 dotenv.config();
+
+const {Pool} = pg;
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -9,7 +11,7 @@ const pool = new Pool({
 pool.on("connect", () => {
     console.log("Connected to Neon");
 });
-pool.on("error", (err) => {
+pool.on("error", (err:Error) => {
     console.error("Unexpected error on idle client", err);
     process.exit(1);
 });

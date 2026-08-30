@@ -1,0 +1,8 @@
+export interface User {
+    id: string;
+    name: string | null;
+    email: string;
+    password_hash: string | null;
+    created_at: Date;
+    updated_at: Date;
+}
