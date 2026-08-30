@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Environment variables
+.env
+.env.example
+
+# Build outputs
+dist/
+build/
+
+# Logs
+logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+coverage/
+
+# Cache
+.cache/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
