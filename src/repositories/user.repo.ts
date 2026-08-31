@@ -23,3 +23,33 @@ export const createUser = async (email: string) => {
     );
     return result.rows[0];
 };
+
+export async function updateUserProfile(
+    userId: string,
+    updates: { name?: string; password_hash?: string },
+): Promise<User> {
+    const fields: string[] = [];
+    const values: unknown[] = [];
+    let idx = 1;
+
+    if (updates.name !== undefined) {
+        fields.push(`name = $${idx++}`);
+        values.push(updates.name);
+    }
+    if (updates.password_hash !== undefined) {
+        fields.push(`password_hash = $${idx++}`);
+        values.push(updates.password_hash);
+    }
+
+    if (fields.length === 0) {
+        throw new Error("No fields to update");
+    }
+
+    fields.push(`updated_at = now()`);
+    values.push(userId);
+
+    const query = `UPDATE users SET ${fields.join(", ")} WHERE id = $${idx} RETURNING *`;
+    console.log("DEBUG QUERY:", query);
+    const result = await pool.query<User>(query, values);
+    return result.rows[0];
+}

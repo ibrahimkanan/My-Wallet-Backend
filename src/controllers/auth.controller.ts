@@ -161,5 +161,5 @@ export const logout = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to log out" });
     }
 };
-
-export const updateProfile = async (req: Request, res: Response) => {};
+ 
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIzZWNiMzkzYS1jODJhLTQ0NmItYWYzYS0zNmFiMTg2MWMzYjQiLCJpYXQiOjE3ODgyMDk3OTUsImV4cCI6MTc4ODIxMDY5NX0.U19sfMR2Oefdasxzc3WUpgTk0qluMurT7Jlichbs4nA
