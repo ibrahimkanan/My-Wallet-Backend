@@ -141,6 +141,25 @@ export const refreshToken = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to refresh token" });
     }
 };
-export const logout = async (req: Request, res: Response) => {};
+export const logout = async (req: Request, res: Response) => {
+    try {
+        const { refreshToken } = req.body;
+        const tokenHash = hashRefreshToken(refreshToken);
+
+        const tokenRecord = await findRefreshTokenByHash(tokenHash);
+        if (!tokenRecord) {
+            return res
+                .status(401)
+                .json({ error: "Invalid or expired refresh token" });
+        }
+
+        await revokeRefreshToken(tokenRecord.id);
+
+        res.json({ status: "ok" });
+    } catch (error) {
+        console.error("Error logging out:", error);
+        res.status(500).json({ error: "Failed to log out" });
+    }
+};
 
 export const updateProfile = async (req: Request, res: Response) => {};
