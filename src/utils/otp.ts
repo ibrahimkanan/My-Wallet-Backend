@@ -8,3 +8,7 @@ export const generateOtp = (): string => {
 export const hashOtpCode = (otp: string): string => {
     return bcrypt.hashSync(otp, 10);
 };
+
+export const verifyOtpCode = (otp: string, hash: string): boolean => {
+    return bcrypt.compareSync(otp, hash);
+};

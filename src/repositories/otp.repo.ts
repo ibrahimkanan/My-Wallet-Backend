@@ -14,7 +14,21 @@ export const createOtpCode = async (
 export const getLatestOtpForEmail = async (email: string) => {
     const result = await pool.query(
         `SELECT * FROM otp_codes WHERE email = $1 ORDER BY created_at DESC LIMIT 1`,
-        [email]
-    )
-    return result.rows[0] ?? null
-}
+        [email],
+    );
+    return result.rows[0] ?? null;
+};
+
+export const getValidOtpForEmail = async (email: string) => {
+    const result = await pool.query(
+        `SELECT * FROM otp_codes WHERE email = $1 AND consumed = false AND expires_at > now() ORDER BY created_at DESC LIMIT 1`,
+        [email],
+    );
+    return result.rows[0] ?? null;
+};
+
+export const markOtpAsConsumed = async (id: string) => {
+    await pool.query("UPDATE otp_codes SET consumed = true WHERE id = $1", [
+        id,
+    ]);
+};

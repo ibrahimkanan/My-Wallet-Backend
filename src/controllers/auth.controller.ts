@@ -5,9 +5,22 @@ import {
     getLatestOtpForEmail,
 } from "../repositories/otp.repo.js";
 import { sendOtpEmail } from "../utils/email.js";
+import { verifyOtpCode } from "../utils/otp.js";
+import {
+    getValidOtpForEmail,
+    markOtpAsConsumed,
+} from "../repositories/otp.repo.js";
+import { findUserByEmail, createUser } from "../repositories/user.repo.js";
+import { signAccessToken } from "../utils/jwt.js";
+import {
+    generateRefreshToken,
+    hashRefreshToken,
+} from "../utils/refreshToken.js";
+import { storeRefreshToken } from "../repositories/refreshToken.repo.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const RESEND_COOLDOWN_SECONDS = 60;
+const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 
 export const requestOtp = async (req: Request, res: Response) => {
     const { email } = req.body;
@@ -40,7 +53,53 @@ export const requestOtp = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to send OTP" });
     }
 };
-export const verifyOtp = async (req: Request, res: Response) => {};
+
+export const verifyOtp = async (req: Request, res: Response) => {
+    try {
+        const { email, code } = req.body;
+
+        const otpRecord = await getValidOtpForEmail(email);
+        if (!otpRecord) {
+            return res.status(400).json({ error: "OTP is invalid or expired" });
+        }
+
+        const isValid = await verifyOtpCode(code, otpRecord.code_hash);
+        if (!isValid) {
+            return res.status(400).json({ error: "OTP is invalid or expired" });
+        }
+
+        await markOtpAsConsumed(otpRecord.id);
+
+        let user = await findUserByEmail(email);
+        let isNewUser = false;
+
+        if (!user) {
+            user = await createUser(email);
+            isNewUser = true;
+        }
+        const accessToken = signAccessToken(user.id);
+        const refreshToken = generateRefreshToken();
+        const refreshExpiresAt = new Date(
+            Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+        );
+
+        await storeRefreshToken(
+            user.id,
+            hashRefreshToken(refreshToken),
+            refreshExpiresAt,
+        );
+        res.json({
+            status: "ok",
+            accessToken,
+            refreshToken,
+            isNewUser,
+            user: { id: user.id, email: user.email, name: user.name },
+        });
+    } catch (error) {
+        console.error("Error verifying OTP:", error);
+        res.status(500).json({ error: "Failed to verify OTP" });
+    }
+};
 export const updateProfile = async (req: Request, res: Response) => {};
 export const refreshToken = async (req: Request, res: Response) => {};
 export const logout = async (req: Request, res: Response) => {};
