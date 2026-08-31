@@ -12,3 +12,18 @@ export const storeRefreshToken = async (
         [userId, tokenHash, expiresAt, deviceInfo],
     );
 };
+
+export const findRefreshTokenByHash = async (tokenHash: string) => {
+    const result = await pool.query(
+        "SELECT * FROM refresh_tokens WHERE token_hash = $1",
+        [tokenHash],
+    );
+    return result.rows[0] ?? null;
+};
+
+export const revokeRefreshToken = async (tokenHash: string) => {
+    await pool.query(
+        "UPDATE refresh_tokens SET revoked = true WHERE token_hash = $1",
+        [tokenHash],
+    );
+};

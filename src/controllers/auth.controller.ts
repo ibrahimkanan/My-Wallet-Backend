@@ -16,7 +16,12 @@ import {
     generateRefreshToken,
     hashRefreshToken,
 } from "../utils/refreshToken.js";
-import { storeRefreshToken } from "../repositories/refreshToken.repo.js";
+import {
+    findRefreshTokenByHash,
+    revokeRefreshToken,
+    storeRefreshToken,
+} from "../repositories/refreshToken.repo.js";
+import { access } from "node:fs";
 
 const OTP_EXPIRY_MINUTES = 10;
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -100,6 +105,42 @@ export const verifyOtp = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Failed to verify OTP" });
     }
 };
-export const updateProfile = async (req: Request, res: Response) => {};
-export const refreshToken = async (req: Request, res: Response) => {};
+export const refreshToken = async (req: Request, res: Response) => {
+    try {
+        const { refreshToken } = req.body;
+        const tokenHash = hashRefreshToken(refreshToken);
+
+        const tokenRecord = await findRefreshTokenByHash(tokenHash);
+        if (!tokenRecord) {
+            return res
+                .status(401)
+                .json({ error: "Invalid or expired refresh token" });
+        }
+
+        await revokeRefreshToken(tokenRecord.id);
+
+        const newRefreshToken = generateRefreshToken();
+        const newEpiresAt = new Date(
+            Date.now() + REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
+        );
+        await storeRefreshToken(
+            tokenRecord.user_id,
+            hashRefreshToken(newRefreshToken),
+            newEpiresAt,
+        );
+
+        const newAccessToken = signAccessToken(tokenRecord.user_id);
+
+        res.json({
+            status: "ok",
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+        });
+    } catch (error) {
+        console.error("Error refreshing token:", error);
+        res.status(500).json({ error: "Failed to refresh token" });
+    }
+};
 export const logout = async (req: Request, res: Response) => {};
+
+export const updateProfile = async (req: Request, res: Response) => {};
