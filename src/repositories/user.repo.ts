@@ -26,7 +26,11 @@ export const createUser = async (email: string) => {
 
 export async function updateUserProfile(
     userId: string,
-    updates: { name?: string; password_hash?: string },
+    updates: {
+        name?: string;
+        password_hash?: string;
+        default_monthly_budget?: number;
+    },
 ): Promise<User> {
     const fields: string[] = [];
     const values: unknown[] = [];
@@ -39,6 +43,10 @@ export async function updateUserProfile(
     if (updates.password_hash !== undefined) {
         fields.push(`password_hash = $${idx++}`);
         values.push(updates.password_hash);
+    }
+    if (updates.default_monthly_budget !== undefined) {
+        fields.push(`default_monthly_budget = $${idx++}`);
+        values.push(updates.default_monthly_budget);
     }
 
     if (fields.length === 0) {
