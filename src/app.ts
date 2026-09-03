@@ -8,6 +8,7 @@ import pool from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import walletRoutes from "./routes/wallet.routes.js";
+import categoryRoutes from "./routes/category.routes.js";
 
 const app = express();
 
@@ -36,5 +37,6 @@ app.get("/health/db", async (req: Request, res: Response) => {
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/wallets", walletRoutes);
+app.use("/categories", categoryRoutes);
 
 export default app;
