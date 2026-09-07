@@ -36,4 +36,6 @@ temp/
 .neon
 
 structure.txt
-workflow.md
+workflow.md
+testCases/
+
