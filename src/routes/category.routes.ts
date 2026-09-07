@@ -6,23 +6,29 @@ import {
     deleteCategory,
 } from "../controllers/category.controller.js";
 import { requireAuth } from "../middleware/auth.middleware.js";
-import { validate } from "../middleware/validate.js";
+import { validate, validateParams } from "../middleware/validate.js";
 import {
     createCategorySchema,
     updateCategorySchema,
+    categoryIdParamSchema,
 } from "../schemas/categories.schema.js";
 
 const router = express.Router();
 
-// All category routes require authentication
 router.post("/", requireAuth, validate(createCategorySchema), createCategory);
 router.get("/", requireAuth, getUserCategories);
 router.patch(
     "/:id",
     requireAuth,
+    validateParams(categoryIdParamSchema),
     validate(updateCategorySchema),
     updateCategory,
 );
-router.delete("/:id", requireAuth, deleteCategory);
+router.delete(
+    "/:id",
+    requireAuth,
+    validateParams(categoryIdParamSchema),
+    deleteCategory,
+);
 
 export default router;

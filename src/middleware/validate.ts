@@ -15,3 +15,18 @@ export const validate = (schema: ZodTypeAny) => {
         next();
     };
 };
+
+
+export const validateParams = (schema: ZodTypeAny) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const result = schema.safeParse(req.params);
+        if (!result.success) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid parameters",
+                errors: result.error.flatten().fieldErrors,
+            });
+        }
+        next();
+    };
+};

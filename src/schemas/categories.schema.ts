@@ -25,3 +25,7 @@ export const updateCategorySchema = z
                 "At least one field (name, type, or icon) must be provided to update",
         },
     );
+
+export const categoryIdParamSchema = z.object({
+    id: z.string().uuid("Invalid category id"),
+});
