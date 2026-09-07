@@ -9,6 +9,7 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import walletRoutes from "./routes/wallet.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import transactionRoutes from "./routes/transaction.routes.js";
 
 const app = express();
 
@@ -38,5 +39,6 @@ app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/wallets", walletRoutes);
 app.use("/categories", categoryRoutes);
+app.use("/transactions", transactionRoutes);
 
 export default app;
