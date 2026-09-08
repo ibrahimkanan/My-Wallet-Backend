@@ -35,20 +35,14 @@ export const getCategoriesByUser = async (
 
 // Get a category by ID
 export const getCategoryById = async (
-    userId: string,
     categoryId: string,
+    userId: string,
 ): Promise<Category | null> => {
-    const result = await pool.query(
-        `
-        SELECT * FROM categories
-        WHERE id = $1 AND user_id = $2;
-        `,
+    const result = await pool.query<Category>(
+        `SELECT * FROM categories WHERE id = $1 AND user_id = $2`,
         [categoryId, userId],
     );
-    if (result.rows.length === 0) {
-        return null;
-    }
-    return result.rows[0];
+    return result.rows[0] ?? null;
 };
 
 // Update a category dynamically
