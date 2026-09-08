@@ -47,8 +47,8 @@ export const getCategoryById = async (
 
 // Update a category dynamically
 export const updateCategory = async (
-    userId: string,
     categoryId: string,
+    userId: string,
     updates: {
         name?: string;
         type?: TransactionType;
@@ -62,12 +62,10 @@ export const updateCategory = async (
         fields.push("name");
         values.push(updates.name);
     }
-
     if (updates.type !== undefined) {
         fields.push("type");
         values.push(updates.type);
     }
-
     if (updates.icon !== undefined) {
         fields.push("icon");
         values.push(updates.icon);
@@ -77,39 +75,29 @@ export const updateCategory = async (
         return null;
     }
 
-    values.push(userId, categoryId);
+    values.push(categoryId, userId);
 
-    const result = await pool.query(
+    const result = await pool.query<Category>(
         `
         UPDATE categories
-        SET 
-        ${fields.map((field, index) => `${field} = $${index + 1}`).join(",")}
-        WHERE user_id = $${values.length - 1} AND id = $${values.length};
+        SET ${fields.map((field, index) => `${field} = $${index + 1}`).join(", ")}
+        WHERE id = $${values.length - 1} AND user_id = $${values.length}
+        RETURNING *;
         `,
         values,
     );
 
-    if (result.rows.length === 0) {
-        return null;
-    }
-
-    return result.rows[0];
+    return result.rows[0] ?? null;
 };
 
 // Delete a category
 export const deleteCategory = async (
-    userId: string,
     categoryId: string,
-): Promise<Category | null> => {
+    userId: string,
+): Promise<boolean> => {
     const result = await pool.query(
-        `
-        DELETE FROM categories
-        WHERE id = $1 AND user_id = $2;
-        `,
+        `DELETE FROM categories WHERE id = $1 AND user_id = $2`,
         [categoryId, userId],
     );
-    if (result.rows.length === 0) {
-        return null;
-    }
-    return result.rows[0];
+    return (result.rowCount ?? 0) > 0;
 };
