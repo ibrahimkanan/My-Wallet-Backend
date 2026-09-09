@@ -11,6 +11,7 @@ import walletRoutes from "./routes/wallet.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import transactionRoutes from "./routes/transaction.routes.js";
 import budgetRoutes from "./routes/budgets.routes.js";
+import chartRoutes from "./routes/chart.routes.js";
 
 const app = express();
 
@@ -42,5 +43,6 @@ app.use("/wallets", walletRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/transactions", transactionRoutes);
 app.use("/budgets", budgetRoutes);
+app.use("/charts", chartRoutes);
 
 export default app;
