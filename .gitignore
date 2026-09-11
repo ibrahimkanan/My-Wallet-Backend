@@ -38,4 +38,9 @@ temp/
 structure.txt
 workflow.md
 testCases/
-
+
+workflow.md
+structure.txt
+node_modules/
+.env
+testCases/
