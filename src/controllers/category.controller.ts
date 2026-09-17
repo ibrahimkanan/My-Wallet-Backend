@@ -23,8 +23,14 @@ export const createCategory = async (req: AuthRequest, res: Response) => {
             status: "ok",
             category,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating category:", error);
+        if (error?.code === "23505") {
+            return res.status(400).json({
+                error: "CATEGORY_ALREADY_EXISTS",
+                message: "Category with this name already exists",
+            });
+        }
         res.status(500).json({ error: "Failed to create category" });
     }
 };
@@ -62,8 +68,14 @@ export const updateCategory = async (req: AuthRequest, res: Response) => {
             status: "ok",
             category,
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error updating category:", error);
+        if (error?.code === "23505") {
+            return res.status(400).json({
+                error: "CATEGORY_ALREADY_EXISTS",
+                message: "Category with this name already exists",
+            });
+        }
         res.status(500).json({ error: "Failed to update category" });
     }
 };
