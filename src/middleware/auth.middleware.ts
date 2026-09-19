@@ -25,6 +25,6 @@ export const requireAuth = (
         next();
     } catch (error) {
         console.error("Error in authentication", error);
-        return res.status(403).json({ error: "invalid or expired token" });
+        return res.status(401).json({ error: "invalid or expired token" });
     }
 };
